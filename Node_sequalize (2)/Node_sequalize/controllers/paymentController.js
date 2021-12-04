@@ -1,22 +1,25 @@
-const {payment, Sequelize,userMovies}=require("../models");
-
+const {payment, sequelize,userMovies}=require("../models");
+const { QueryTypes } = require('sequelize');
 const moviePayment= async(req,res)=>
 {
     var {userId,MovieId,movieRentType}=req.body;
     console.log(userId)
     var paymentStatus=true;
-    const usermovie={};
+    
     try{
-       const userpayment= await payment.create({userId,MovieId,paymentStatus,movieRentType})
+        var rentexpdate=await sequelize.query("SELECT DATE_ADD( NOW(), INTERVAL 30 DAY) as rentdate; ",{
+            type: QueryTypes.SELECT
+          })
+       var userpayment= await payment.create({userId,MovieId,paymentStatus,movieRentType})
        if(userpayment.paymentStatus===true){
            let userMovieInfo={
                userId:userId,
                MovieId:MovieId,
                RentStatus:(movieRentType==="Rent")?true:false,
-               RentExpireDate:Sequelize.NOW()+30,
+               RentExpireDate:rentexpdate[0].rentdate,
                BuyedStatus:(movieRentType==="Buy")?true:false
            }
-           usermovie=await userMovies.create(userMovieInfo)
+         var usermovie=await userMovies.create(userMovieInfo)
        }
        return res.status(200).json({userpayment,usermovie})
     }catch(e){
