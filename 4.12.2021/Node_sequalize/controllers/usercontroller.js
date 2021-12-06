@@ -2,9 +2,15 @@ const {user}=require("../models");
 
 
 var addNewUser = async (req, resp)=> {
-    const {userEmail, userName, userPhone, userPassword} = req.body;
+    var usersinfo={
+        userEmail:req.body.user_mail,
+         userName:req.body.username,
+          userPhone:req.body.phone_no, 
+          userPassword:req.body.password
+    }
+   // const {userEmail, userName, userPhone, userPassword} = req.body;
     try{
-        const users = await user.create({userEmail, userName, userPhone, userPassword});
+        const users = await user.create(usersinfo);
         return resp.status(200).json(users);
 
     }catch(e){
